@@ -598,43 +598,23 @@
       statusDiv.style.color = "#15803d";
       
       try {
-        const promptInstruction = `Analisislah gambar tabel kurs mata uang asing ini. Ekstrak data kurs Beli dan Jual untuk kategori Bank Notes (BN) dan Telegraphic Transfer (TT) untuk mata uang berikut jika ada: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
-        
-        Kembalikan respons berupa objek JSON murni tanpa format markdown apa pun (jangan gunakan pembungkus \`\`\`json), tanpa teks tambahan di luar JSON, dan ikuti struktur persis seperti ini:
-        {
-          "USD": { "bn_b": "nilai", "bn_j": "nilai", "tt_b": "nilai", "tt_j": "nilai" },
-          "AUD": { "bn_b": "nilai", "bn_j": "nilai", "tt_b": "nilai", "tt_j": "nilai" }
-        }
-        Catatan: Ambil angka mentahnya saja (contoh: 16250 atau 103.50). Jika data mata uang atau nilai tertentu tidak ditemukan di gambar, isi nilainya dengan "".`;
-
-        // Mengirimkan request ke serverless function Vercel di web kamu
+        // Hanya mengirim data payload minimal ke serverless function Vercel Anda
         const response = await fetch('/api/scan', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            imageBase64: base64Data,
-            mimeType: mimeType,
-            prompt: promptInstruction
+            data: base64Data,
+            mimeType: mimeType
           })
         });
 
         if (!response.ok) {
           const errData = await response.json();
-          throw new Error(errData.error || "Gagal berkomunikasi dengan server.");
+          throw new Error(errData.error || "Gagal berkomunikasi dengan server backend.");
         }
 
-        const resData = await response.json();
-        
-        if (!resData.candidates || !resData.candidates[0].content.parts[0].text) {
-          throw new Error("Format respons AI tidak dikenali atau serverless API bermasalah.");
-        }
-
-        let textResult = resData.candidates[0].content.parts[0].text;
-        
-        // Membersihkan sisa backticks jika AI tidak sengaja memuatnya
-        textResult = textResult.replace(/```json/g, "").replace(/```/g, "").trim();
-        
-        const ratesData = JSON.parse(textResult);
+        // Serverless backend langsung mengembalikan data JSON kurs yang bersih
+        const ratesData = await response.json();
         applyAiRates(ratesData);
         
         statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
