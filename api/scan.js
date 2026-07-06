@@ -1,63 +1,61 @@
 export default async function handler(req, res) {
-  // Hanya menerima request POST
+  // Hanya izinkan metode POST
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const { mimeType, base64Data } = req.body;
-    
-    // Mengambil API Key dari sistem rahasia Vercel (bukan dari kode)
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      return res.status(500).json({ error: 'Sistem Error: API Key belum dipasang di Dashboard Vercel.' });
+    const { imageBase64, mimeType } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'Data gambar (Base64) diperlukan.' });
     }
 
-    const aiPrompt = `Kamu adalah sistem AI pemindai tabel kurs yang bertugas mengekstrak angka kurs dari gambar secara akurat.
-Mata uang yang dicari: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
-Kategori: BANK NOTES (bn_b untuk beli, bn_j untuk jual) dan TELEGRAPHIC TRANSFER (tt_b untuk beli, tt_j untuk jual).
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'GEMINI_API_KEY belum dikonfigurasi di Vercel.' });
+    }
 
-Keluarkan hasil akhir HANYA dalam format JSON mentah tanpa blok kode markdown (\`\`\`json) dan tanpa kalimat pembuka/penutup apapun. Struktur JSON wajib persis seperti ini:
-{
-  "USD": {"bn_b": "16100", "bn_j": "16350", "tt_b": "16150", "tt_j": "16250"},
-  "AUD": {"bn_b": "10400", "bn_j": "10650", "tt_b": "10450", "tt_j": "10550"}
-}
-Isikan angka mentah tanpa pemisah ribuan (titik/koma). Jika mata uang tertentu tidak ada di tabel gambar, kosongkan saja nilainya "".`;
-
-    // Menggunakan model gemini-1.5-flash yang super cepat agar tidak terkena timeout limit Vercel (10 detik)
+    // Endpoint resmi Gemini 1.5 Flash menggunakan API Key dari Vercel
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        contents: [{
-          parts: [
-            { text: aiPrompt },
-            { inlineData: { mimeType: mimeType, data: base64Data } }
-          ]
-        }]
+        contents: [
+          {
+            parts: [
+              {
+                text: "Kamu adalah AI yang bertugas mengekstrak data tabel kurs valuta asing dari gambar ini. Kembalikan hasilnya dalam bentuk JSON yang rapi dengan struktur objek atau array yang berisi mata_uang, kurs_beli, dan kurs_jual."
+              },
+              {
+                inlineData: {
+                  mimeType: mimeType || "image/png",
+                  data: imageBase64 // String base64 murni tanpa prefix "data:image/png;base64,"
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json" // Memaksa Gemini mengembalikan format JSON
+        }
       })
     });
 
-    const resData = await response.json();
-    
+    const data = await response.json();
+
     if (!response.ok) {
-      return res.status(response.status).json({ error: resData.error?.message || 'Google Gemini AI Error' });
+      return res.status(response.status).json({ error: data.error?.message || 'Gagal memproses ke Gemini API' });
     }
 
-    let rawText = resData.candidates[0].content.parts[0].text.trim();
-    
-    // Membersihkan teks jika AI membandel menyertakan markdown
-    if (rawText.startsWith("```")) {
-      rawText = rawText.replace(/^```json/, "").replace(/^```/, "").replace(/```$/, "").trim();
-    }
-
-    // Kembalikan data dalam bentuk JSON bersih ke frontend
-    return res.status(200).json(JSON.parse(rawText));
+    // Kirimkan hasil ekstraksi dari Gemini kembali ke Frontend
+    return res.status(200).json(data);
 
   } catch (error) {
-    return res.status(500).json({ error: 'Gagal memproses backend: ' + error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
