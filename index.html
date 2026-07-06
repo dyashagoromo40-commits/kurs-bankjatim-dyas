@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generator Special Rate Bank Jatim v5.0 - Public Auto Scan</title>
   
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -95,7 +95,7 @@
       margin-top: 8px;
       transition: background 0.2s;
       box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
-      width: 100%; /* Menyesuaikan area sentuh HP */
+      width: 100%;
     }
 
     .scan-btn-label:hover {
@@ -134,7 +134,7 @@
     }
 
     .table-input td {
-      padding: 6px 2px; /* Diperlebar sedikit agar nyaman di-tap jari di HP */
+      padding: 6px 2px;
     }
 
     .currency-label {
@@ -145,14 +145,14 @@
 
     .input-field {
       width: 100%;
-      padding: 8px 10px; /* Padding lebih gemuk responsif touch input */
+      padding: 8px 10px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-family: inherit;
       font-size: 13px;
       font-weight: 500;
       transition: all 0.2s;
-      -webkit-appearance: none; /* Cegah gaya default safari mobile */
+      -webkit-appearance: none;
     }
 
     .input-field:focus {
@@ -191,14 +191,14 @@
 
     .poster-scroll-container {
       width: 100%;
-      overflow-x: auto; /* Memungkinkan swipe horizontal di HP */
+      overflow-x: auto;
       padding: 10px 0 25px 0;
       display: flex;
       justify-content: flex-start;
-      -webkit-overflow-scrolling: touch; /* Perhalus scrolling di iOS/Safari */
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* POSTER UKURAN TETAP (Wajib untuk html2canvas agar presisi) */
+    /* POSTER UKURAN TETAP */
     .poster {
       width: 1200px;
       height: 675px;
@@ -208,7 +208,7 @@
       position: relative;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-      flex-shrink: 0; /* Mencegah poster tertekan mengecil */
+      flex-shrink: 0;
     }
 
     .poster-bg-grid {
@@ -390,29 +390,29 @@
       border-radius: 6px;
     }
 
-    /* MEDIA QUERIES UNTUK RESPONSIVITAS TOTAL (LAPTOP KECIL & HP) */
+    /* MEDIA QUERIES */
     @media (max-width: 1650px) {
       .app-container {
-        grid-template-columns: 1fr; /* Berubah jadi 1 kolom bertumpuk ke bawah */
+        grid-template-columns: 1fr;
         max-width: 1200px;
       }
       .input-panel {
-        max-height: none; /* Matikan batas scroll panel di mode tumpuk */
+        max-height: none;
       }
       .poster-scroll-container {
-        justify-content: center; /* Tetap di tengah jika muat di layar */
+        justify-content: center;
       }
     }
 
     @media (max-width: 1240px) {
       .poster-scroll-container {
-        justify-content: flex-start; /* Beri ruang agar bisa di-swipe jika layar lebih kecil dari poster */
+        justify-content: flex-start;
       }
     }
 
     @media (max-width: 480px) {
       body {
-        padding: 8px; /* Hemat ruang layar HP tipis */
+        padding: 8px;
       }
       .input-panel {
         padding: 15px;
@@ -613,7 +613,6 @@
 
     handleLiveUpdate();
 
-    // Sembunyikan panduan teks swipe jika dibuka di komputer layar lebar
     if (window.innerWidth > 1240) {
       const hint = document.querySelector(".hide-on-desktop");
       if(hint) hint.style.display = "none";
@@ -698,31 +697,28 @@
     handleLiveUpdate();
   }
 
+  // FUNGSI BARU MENGGUNAKAN HTML-TO-IMAGE (MENDUKUNG FULL CSS GLOW & GLASSMORPHISM)
   function downloadPoster() {
     const posterNode = document.querySelector("#poster");
     handleLiveUpdate();
 
     setTimeout(() => {
-      // Ditambahkan parameter windowWidth agar rendering html2canvas di HP tetap utuh 1200px
-      html2canvas(posterNode, {
-        scale: 2,
-        useCORS: true, 
-        allowTaint: false,
+      htmlToImage.toPng(posterNode, {
+        pixelRatio: 2, // Menggantikan scale: 2 (Hasil HD tajam)
         backgroundColor: "#ffffff",
-        windowWidth: 1200,
-        windowHeight: 675
-      }).then(canvas => {
-        try {
-          let triggerLink = document.createElement("a");
-          triggerLink.download = "Indikasi_Special_Rate_Bank_Jatim.png";
-          triggerLink.href = canvas.toDataURL("image/png");
-          triggerLink.click();
-        } catch (securityError) {
-          console.error("Gagal mengekspor gambar karena batasan CORS/Protokol:", securityError);
-          alert("Gagal mengunduh gambar otomatis. Coba akses via web server resmi.");
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left'
         }
-      }).catch(err => {
-        console.error("html2canvas mendeteksi error:", err);
+      })
+      .then(dataUrl => {
+        let triggerLink = document.createElement("a");
+        triggerLink.download = "Indikasi_Special_Rate_Bank_Jatim.png";
+        triggerLink.href = dataUrl;
+        triggerLink.click();
+      })
+      .catch(err => {
+        console.error("html-to-image mendeteksi error:", err);
         alert("Terjadi kesalahan sistem saat memproses konversi gambar poster.");
       });
     }, 300);
