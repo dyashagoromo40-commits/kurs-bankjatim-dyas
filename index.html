@@ -6,9 +6,12 @@
   <title>Generator Special Rate Bank Jatim v5.0 - Public Auto Scan</title>
   
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
+    /* FIX 1: Memasukkan font langsung ke dalam CSS agar terdeteksi oleh mesin html-to-image */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
     :root {
       --bj-red: #e31b23;
       --bj-red-glow: rgba(227, 27, 35, 0.2);
@@ -198,11 +201,10 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* POSTER ULTRAMODERN CANVAS (1200x675) */
+    /* POSTER CANVAS (1200x675) */
     .poster {
       width: 1200px;
       height: 675px;
-      /* EFEK GLOW DIBAKED LANGSUNG DI BACKGROUND AGAR KONSISTEN DI BELAKANG LAYER */
       background: 
         radial-gradient(circle at 85% 20%, rgba(227, 27, 35, 0.26) 0%, rgba(227, 27, 35, 0.08) 35%, transparent 65%),
         radial-gradient(circle at 15% 85%, rgba(227, 27, 35, 0.16) 0%, rgba(227, 27, 35, 0.04) 35%, transparent 60%),
@@ -295,12 +297,11 @@
     }
 
     .rate-card {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      /* FIX 2: Menggunakan background semi-solid putih tinggi (0.95) tanpa efek blur agar tampilan web & hasil download PNG 100% konsisten */
+      background: rgba(255, 255, 255, 0.95);
       border-radius: 24px;
       padding: 20px 24px;
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.04);
     }
 
@@ -468,7 +469,7 @@
 
         <div class="poster-content">
           <div class="poster-header">
-            <img class="brand-logo" src="Bank Jatim Logo (PNG-1080p) - FileVector69.png" alt="Logo Bank Jatim">
+            <img class="brand-logo" src="Bank Jatim Logo (PNG-1080p) - FileVector69.png" alt="Logo Bank Jatim" crossorigin="anonymous">
             <div id="live-date" class="date-badge">-</div>
           </div>
 
@@ -689,17 +690,25 @@
     handleLiveUpdate();
   }
 
+  /* FIX 3: Mengunci dimensi html-to-image ke rasio 1200x675 HD asli dan mengaktifkan cacheBust */
   function downloadPoster() {
     const posterNode = document.querySelector("#poster");
     handleLiveUpdate();
 
     setTimeout(() => {
       htmlToImage.toPng(posterNode, {
-        pixelRatio: 2,
+        width: 1200,
+        height: 675,
+        pixelRatio: 2, // Hasil HD jernih anti pecah
         backgroundColor: "#ffffff",
+        cacheBust: true, // Mengatasi isu cache aset gambar eksternal / CDN bendera
         style: {
           transform: 'scale(1)',
-          transformOrigin: 'top left'
+          transformOrigin: 'top left',
+          width: '1200px',
+          height: '675px',
+          left: '0',
+          top: '0'
         }
       })
       .then(dataUrl => {
