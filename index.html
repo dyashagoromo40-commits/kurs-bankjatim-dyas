@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generator Special Rate Bank Jatim v5.0 - Public Auto Scan</title>
   
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bj-red: #e31b23;
-      --bj-red-glow: rgba(227, 27, 35, 0.15);
+      --bj-red-glow: rgba(227, 27, 35, 0.2);
       --bg-dark: #0f172a;
       --panel-bg: #ffffff;
       --text-main: #1e293b;
@@ -26,15 +26,16 @@
 
     body {
       font-family: 'Poppins', sans-serif;
-      background: #f8fafc;
+      background: #f1f5f9;
       color: var(--text-main);
-      padding: 20px;
+      padding: 15px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
       min-height: 100vh;
     }
 
+    /* CONTAINER UTAMA RESPONSIF */
     .app-container {
       display: grid;
       grid-template-columns: 460px 1fr;
@@ -72,7 +73,7 @@
       margin-top: 4px;
     }
 
-    /* BOX SCANNER SECURE BACKEND */
+    /* BOX SCANNER */
     .scanner-box {
       background: #f0fdf4;
       border: 2px dashed #16a34a;
@@ -94,6 +95,7 @@
       margin-top: 8px;
       transition: background 0.2s;
       box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+      width: 100%;
     }
 
     .scan-btn-label:hover {
@@ -132,24 +134,25 @@
     }
 
     .table-input td {
-      padding: 4px 2px;
+      padding: 6px 2px;
     }
 
     .currency-label {
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--bg-dark);
     }
 
     .input-field {
       width: 100%;
-      padding: 6px 10px;
+      padding: 8px 10px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-family: inherit;
       font-size: 13px;
       font-weight: 500;
       transition: all 0.2s;
+      -webkit-appearance: none;
     }
 
     .input-field:focus {
@@ -177,20 +180,39 @@
       background: #1e293b;
     }
 
-    /* POSTER DISPLAY PREVIEW */
+    /* PREVIEW AREA */
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .poster-scroll-container {
+      width: 100%;
+      overflow-x: auto;
+      padding: 10px 0 25px 0;
+      display: flex;
+      justify-content: flex-start;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* POSTER ULTRAMODERN CANVAS (1200x675) */
     .poster {
       width: 1200px;
       height: 675px;
-      /* Menggunakan Radial Gradient langsung di background agar aman dari bug html2canvas */
+      /* EFEK GLOW DIBAKED LANGSUNG DI BACKGROUND AGAR KONSISTEN DI BELAKANG LAYER */
       background: 
-        radial-gradient(circle 500px at 100% 0%, rgba(227, 27, 35, 0.12), transparent),
-        radial-gradient(circle 400px at 0% 100%, rgba(227, 27, 35, 0.08), transparent),
+        radial-gradient(circle at 85% 20%, rgba(227, 27, 35, 0.26) 0%, rgba(227, 27, 35, 0.08) 35%, transparent 65%),
+        radial-gradient(circle at 15% 85%, rgba(227, 27, 35, 0.16) 0%, rgba(227, 27, 35, 0.04) 35%, transparent 60%),
         #ffffff;
-      border-radius: 24px;
-      padding: 45px;
+      border-radius: 28px;
+      padding: 32px 42px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.12);
+      flex-shrink: 0;
     }
 
     .poster-bg-grid {
@@ -200,9 +222,9 @@
       width: 100%;
       height: 100%;
       background-image: 
-        linear-gradient(rgba(226, 232, 240, 0.4) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(226, 232, 240, 0.4) 1px, transparent 1px);
-      background-size: 30px 30px;
+        linear-gradient(rgba(226, 232, 240, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(226, 232, 240, 0.3) 1px, transparent 1px);
+      background-size: 24px 24px;
       z-index: 1;
     }
 
@@ -222,63 +244,72 @@
     }
 
     .brand-logo {
-      height: 52px;
+      height: 44px;
+      object-fit: contain;
     }
 
     .date-badge {
-      background: var(--bg-dark);
-      color: white;
+      background: #0f172a;
+      color: #ffffff;
       padding: 6px 16px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 600;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     }
 
     .poster-title-area {
       text-align: center;
-      margin-top: -10px;
+      margin-top: -2px;
     }
 
     .main-title {
-      font-size: 44px;
+      font-size: 40px;
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: #0f172a;
+      line-height: 1.2;
     }
 
     .main-title span {
       color: var(--bj-red);
+      text-shadow: 0 0 25px rgba(227, 27, 35, 0.45);
     }
 
     .sub-title {
-      font-size: 15px;
-      color: #475569;
-      font-weight: 500;
-      letter-spacing: 2px;
-      margin-top: 2px;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      margin-top: 4px;
+      text-transform: uppercase;
     }
 
+    /* RATES BLOCK CONTAINER */
     .rates-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 35px;
-      margin: 20px 0;
+      gap: 24px;
+      margin: 10px 0;
     }
 
     .rate-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 24px;
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 20px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.04);
     }
 
     .card-heading {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 800;
-      color: var(--bj-red);
-      letter-spacing: 1px;
-      margin-bottom: 15px;
+      color: #0f172a;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
       border-left: 4px solid var(--bj-red);
       padding-left: 10px;
     }
@@ -289,63 +320,101 @@
     }
 
     .display-table th {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: #64748b;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f1f5f9;
+      color: #94a3b8;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
       text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .display-table td {
-      padding: 8px 0;
-      font-size: 16px;
+      padding: 7px 0;
+      font-size: 15px;
       font-weight: 600;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
+      border-bottom: 1px solid rgba(241, 245, 249, 0.6);
+      color: #1e293b;
+      font-variant-numeric: tabular-nums; 
     }
 
     .row-currency {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-weight: 700;
-      color: var(--bg-dark);
+      color: #0f172a;
     }
 
     .flag-icon {
-      width: 24px;
-      height: 16px;
+      width: 25px;
+      height: 17px;
       object-fit: cover;
-      border-radius: 3px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
     }
 
     .text-center { text-align: center; }
     .text-right { text-align: right; }
 
+    /* FOOTER DESIGN */
     .poster-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-top: 1px solid #e2e8f0;
-      padding-top: 12px;
-      font-size: 11px;
+      padding-top: 10px;
+      font-size: 10.5px;
       color: #64748b;
     }
 
     .footer-note {
       font-weight: 500;
-      max-width: 750px;
+      max-width: 820px;
       line-height: 1.4;
     }
 
     .timestamp {
-      font-weight: 600;
-      color: var(--bg-dark);
-      background: #f1f5f9;
-      padding: 4px 10px;
+      font-weight: 700;
+      color: #0f172a;
+      background: rgba(15, 23, 42, 0.05);
+      padding: 5px 12px;
       border-radius: 6px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    /* MEDIA QUERIES */
+    @media (max-width: 1650px) {
+      .app-container {
+        grid-template-columns: 1fr;
+        max-width: 1200px;
+      }
+      .input-panel {
+        max-height: none;
+      }
+      .poster-scroll-container {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 1240px) {
+      .poster-scroll-container {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+      .input-panel {
+        padding: 15px;
+      }
+      .scan-btn-label {
+        font-size: 13px;
+        padding: 12px 16px;
+      }
     }
   </style>
 </head>
@@ -361,9 +430,7 @@
 
     <div class="scanner-box">
       <p style="font-size: 13px; font-weight: 700; color: #166534; margin-bottom: 6px;">Auto Scan Kurs Valas Aktif</p>
-      <p style="font-size: 11px; color: #15803d; margin-bottom: 12px;">(Direct Client-Side Gemini AI v2.5)</p>
-      
-      <input type="password" id="gemini-key" class="input-field" placeholder="Masukkan Gemini API Key Anda" style="margin-bottom: 12px; text-align: center;">
+      <p style="font-size: 11px; color: #15803d; margin-bottom: 12px;">(Secure Backend Serverless AI)</p>
       
       <label class="scan-btn-label">
         Ambil / Pilih Gambar
@@ -392,47 +459,52 @@
   </div>
 
   <div class="preview-area">
-    <div id="poster" class="poster">
-      <div class="poster-bg-grid"></div>
+    <p style="font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 500;" class="hide-on-desktop">
+      *Geser poster ke kanan/kiri untuk melihat tampilan penuh di HP
+    </p>
+    <div class="poster-scroll-container">
+      <div id="poster" class="poster">
+        <div class="poster-bg-grid"></div>
 
-      <div class="poster-content">
-        <div class="poster-header">
-          <img class="brand-logo" src="Bank Jatim Logo (PNG-1080p) - FileVector69.png" alt="Logo Bank Jatim">
-          <div id="live-date" class="date-badge">-</div>
-        </div>
-
-        <div class="poster-title-area">
-          <div class="main-title">INDIKASI <span>SPECIAL RATE</span></div>
-          <div class="sub-title">PT BANK PEMBANGUNAN DAERAH JAWA TIMUR, TBK</div>
-        </div>
-
-        <div class="rates-container">
-          <div class="rate-card">
-            <div class="card-heading">BANK NOTES</div>
-            <table class="display-table">
-              <thead>
-                <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
-              </thead>
-              <tbody id="display-bn"></tbody>
-            </table>
+        <div class="poster-content">
+          <div class="poster-header">
+            <img class="brand-logo" src="Bank Jatim Logo (PNG-1080p) - FileVector69.png" alt="Logo Bank Jatim">
+            <div id="live-date" class="date-badge">-</div>
           </div>
 
-          <div class="rate-card">
-            <div class="card-heading">TELEGRAPHIC TRANSFER</div>
-            <table class="display-table">
-              <thead>
-                <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
-              </thead>
-              <tbody id="display-tt"></tbody>
-            </table>
+          <div class="poster-title-area">
+            <div class="main-title">INDIKASI <span>SPECIAL RATE</span></div>
+            <div class="sub-title">PT BANK PEMBANGUNAN DAERAH JAWA TIMUR, TBK</div>
           </div>
-        </div>
 
-        <div class="poster-footer">
-          <div class="footer-note">
-            *Merupakan indikasi pada jam tersebut untuk transaksi &ge; IDR 25 juta (Bank Notes) atau &ge; USD 2.000 (Telegraphic Transfer). Kurs dapat berubah sewaktu-waktu sesuai kondisi pasar keuangan. Segera hubungi Cabang untuk mendapatkan kurs yang berlaku.
+          <div class="rates-container">
+            <div class="rate-card">
+              <div class="card-heading">BANK NOTES</div>
+              <table class="display-table">
+                <thead>
+                  <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
+                </thead>
+                <tbody id="display-bn"></tbody>
+              </table>
+            </div>
+
+            <div class="rate-card">
+              <div class="card-heading">TELEGRAPHIC TRANSFER</div>
+              <table class="display-table">
+                <thead>
+                  <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
+                </thead>
+                <tbody id="display-tt"></tbody>
+              </table>
+            </div>
           </div>
-          <div id="live-timestamp" class="timestamp">Update: -</div>
+
+          <div class="poster-footer">
+            <div class="footer-note">
+              *Merupakan indikasi pada jam tersebut untuk transaksi &ge; IDR 25 juta (Bank Notes) atau &ge; USD 2.000 (Telegraphic Transfer). Kurs dapat berubah sewaktu-waktu sesuai kondisi pasar keuangan. Segera hubungi Cabang untuk mendapatkan kurs yang berlaku.
+            </div>
+            <div id="live-timestamp" class="timestamp">Update: -</div>
+          </div>
         </div>
       </div>
     </div>
@@ -532,6 +604,11 @@
     });
 
     handleLiveUpdate();
+
+    if (window.innerWidth > 1240) {
+      const hint = document.querySelector(".hide-on-desktop");
+      if(hint) hint.style.display = "none";
+    }
   }
 
   function handleLiveUpdate() {
@@ -558,15 +635,7 @@
   async function processAndScan(input) {
     if (!input.files || !input.files[0]) return;
     
-    const apiKey = document.getElementById("gemini-key").value.trim();
     const statusDiv = document.getElementById("scan-status");
-
-    if (!apiKey) {
-      statusDiv.innerHTML = "❌ Gagal: Masukkan Gemini API Key terlebih dahulu.";
-      statusDiv.style.color = "#dc2626";
-      return;
-    }
-    
     const file = input.files[0];
     statusDiv.innerHTML = "⏳ Menyiapkan dokumen gambar...";
     statusDiv.style.color = "#15803d";
@@ -576,54 +645,32 @@
       const base64Data = e.target.result.split(',')[1];
       const mimeType = file.type;
       
-      statusDiv.innerHTML = "🧠 Memproses data langsung via Gemini AI (gemini-2.5-flash)...";
+      statusDiv.innerHTML = "🧠 Memproses data lewat Server AI...";
+      statusDiv.style.color = "#15803d";
       
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        
-        const promptInstruction = `Analisislah gambar tabel kurs mata uang asing ini. Ekstrak data kurs Beli dan Jual untuk kategori Bank Notes (BN) dan Telegraphic Transfer (TT) untuk mata uang berikut jika ada: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
-        
-        Kembalikan respons berupa objek JSON murni tanpa format markdown apa pun (jangan gunakan pembungkus \`\`\`json), tanpa teks tambahan di luar JSON, dan ikuti struktur persis seperti ini:
-        {
-          "USD": { "bn_b": "nilai", "bn_j": "nilai", "tt_b": "nilai", "tt_j": "nilai" },
-          "AUD": { "bn_b": "nilai", "bn_j": "nilai", "tt_b": "nilai", "tt_j": "nilai" }
-        }
-        Catatan: Ambil angka mentahnya saja (contoh: 16250 atau 103.50). Jika data mata uang atau nilai tertentu tidak ditemukan di gambar, isi nilainya dengan "".`;
-
-        const response = await fetch(url, {
+        const response = await fetch("/api/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: promptInstruction },
-                { inlineData: { mimeType: mimeType, data: base64Data } }
-              ]
-            }],
-            generationConfig: {
-              responseMimeType: "application/json"
-            }
+            mimeType: mimeType,
+            data: base64Data
           })
         });
 
+        const ratesData = await response.json();
+
         if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error?.message || "Gagal berkomunikasi dengan API");
+          throw new Error(ratesData.error || "Terjadi kesalahan server.");
         }
 
-        const resData = await response.json();
-        let textResult = resData.candidates[0].content.parts[0].text;
-        
-        textResult = textResult.replace(/```json/g, "").replace(/```/g, "").trim();
-        
-        const ratesData = JSON.parse(textResult);
         applyAiRates(ratesData);
         
         statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
         statusDiv.style.color = "#16a34a";
       } catch (error) {
         console.error(error);
-        statusDiv.innerHTML = `❌ Gagal memproses AI: ${error.message}`;
+        statusDiv.innerHTML = `❌ ${error.message}`;
         statusDiv.style.color = "#dc2626";
       }
     };
@@ -647,23 +694,22 @@
     handleLiveUpdate();
 
     setTimeout(() => {
-      html2canvas(posterNode, {
-        scale: 2,
-        useCORS: true, 
-        allowTaint: false,
-        backgroundColor: "#ffffff"
-      }).then(canvas => {
-        try {
-          let triggerLink = document.createElement("a");
-          triggerLink.download = "Indikasi_Special_Rate_Bank_Jatim.png";
-          triggerLink.href = canvas.toDataURL("image/png");
-          triggerLink.click();
-        } catch (securityError) {
-          console.error("Gagal mengekspor gambar karena batasan CORS/Protokol:", securityError);
-          alert("Gagal mengunduh gambar otomatis. Coba akses via web server resmi.");
+      htmlToImage.toPng(posterNode, {
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left'
         }
-      }).catch(err => {
-        console.error("html2canvas mendeteksi error:", err);
+      })
+      .then(dataUrl => {
+        let triggerLink = document.createElement("a");
+        triggerLink.download = "Indikasi_Special_Rate_Bank_Jatim.png";
+        triggerLink.href = dataUrl;
+        triggerLink.click();
+      })
+      .catch(err => {
+        console.error("html-to-image mendeteksi error:", err);
         alert("Terjadi kesalahan sistem saat memproses konversi gambar poster.");
       });
     }, 300);
