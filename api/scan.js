@@ -1,61 +1,66 @@
+// api/scan.js
+
 export default async function handler(req, res) {
-  // Hanya izinkan metode POST
+  // Hanya menerima metode POST
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).json({ error: 'Metode tidak diizinkan. Gunakan POST.' });
+  }
+
+  const { mimeType, data } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  // Validasi Environment Variable di Vercel
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Konfigurasi gagal: GEMINI_API_KEY belum dipasang di Vercel.' });
   }
 
   try {
-    const { imageBase64, mimeType } = req.body;
-
-    if (!imageBase64) {
-      return res.status(400).json({ error: 'Data gambar (Base64) diperlukan.' });
+    // Endpoint resmi Google Gemini menggunakan versi terbaru yang stabil (gemini-2.5-flash)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    
+    const promptInstruction = `Analisislah gambar tabel kurs mata uang asing ini. Ekstrak data kurs Beli dan Jual untuk kategori Bank Notes (BN) dan Telegraphic Transfer (TT) untuk mata uang berikut jika ada: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
+    
+    Kembalikan respons berupa objek JSON murni tanpa format markdown apa pun (jangan gunakan pembungkus \`\`\`json), tanpa teks tambahan di luar JSON, dan ikuti struktur persis seperti ini:
+    {
+      "USD": { "bn_b": "nilai", "bn_j": "nilai", "tt_b": "nilai", "tt_j": "nilai" },
+      "AUD": { "bn_b": "nilai", "bn_j": "nilai", "tt_b": "nilai", "tt_j": "nilai" }
     }
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY belum dikonfigurasi di Vercel.' });
-    }
-
-    // Endpoint resmi Gemini 1.5 Flash menggunakan API Key dari Vercel
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    Catatan: Ambil angka mentahnya saja (contoh: 16250 atau 103.50). Jika data mata uang atau nilai tertentu tidak ditemukan di gambar, isi nilainya dengan "".`;
 
     const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: "Kamu adalah AI yang bertugas mengekstrak data tabel kurs valuta asing dari gambar ini. Kembalikan hasilnya dalam bentuk JSON yang rapi dengan struktur objek atau array yang berisi mata_uang, kurs_beli, dan kurs_jual."
-              },
-              {
-                inlineData: {
-                  mimeType: mimeType || "image/png",
-                  data: imageBase64 // String base64 murni tanpa prefix "data:image/png;base64,"
-                }
-              }
-            ]
-          }
-        ],
+        contents: [{
+          parts: [
+            { text: promptInstruction },
+            { inlineData: { mimeType: mimeType, data: data } }
+          ]
+        }],
         generationConfig: {
-          responseMimeType: "application/json" // Memaksa Gemini mengembalikan format JSON
+          responseMimeType: "application/json"
         }
       })
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'Gagal memproses ke Gemini API' });
+      const errData = await response.json();
+      return res.status(response.status).json({ error: errData.error?.message || "Gagal merespons dari Gemini API" });
     }
 
-    // Kirimkan hasil ekstraksi dari Gemini kembali ke Frontend
-    return res.status(200).json(data);
+    const resData = await response.json();
+    let textResult = resData.candidates[0].content.parts[0].text;
+    
+    // Bersihkan pembungkus markdown jika ada secara tidak sengaja
+    textResult = textResult.replace(/```json/g, "").replace(/```/g, "").trim();
+    
+    const ratesData = JSON.parse(textResult);
+    
+    // Kembalikan data kurs yang bersih ke frontend
+    return res.status(200).json(ratesData);
 
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error: ' + error.message });
   }
 }
