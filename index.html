@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generator Special Rate Bank Jatim v4.0 - 100% Smart AI Vision</title>
+  <title>Generator Special Rate Bank Jatim v5.0 - Public Auto Scan</title>
   
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -72,49 +72,26 @@
       margin-top: 4px;
     }
 
-    /* BOX SCANNER DENGAN INPUT API KEY */
+    /* BOX SCANNER SECURE BACKEND */
     .scanner-box {
       background: #f0fdf4;
       border: 2px dashed #16a34a;
       border-radius: 12px;
-      padding: 18px;
+      padding: 22px;
       text-align: center;
       margin-bottom: 15px;
-    }
-
-    .api-key-container {
-      margin-bottom: 12px;
-      text-align: left;
-    }
-
-    .api-key-container label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #166534;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .api-input {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #bbf7d0;
-      border-radius: 6px;
-      font-size: 12px;
-      background: #ffffff;
-      font-family: monospace;
     }
 
     .scan-btn-label {
       display: inline-block;
       background: #16a34a;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 5px;
+      margin-top: 8px;
       transition: background 0.2s;
       box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
     }
@@ -409,12 +386,8 @@
     </div>
 
     <div class="scanner-box">
-      <div class="api-key-container">
-        <label for="gemini-key">🔑 ENTER GEMINI API KEY:</label>
-        <input type="password" id="gemini-key" class="api-input" placeholder="AIzaSy..." value="">
-      </div>
-      
-      <p style="font-size: 12px; font-weight: 600; color: #166534;">Auto Scan Kurs Valas (100% Client AI)</p>
+      <p style="font-size: 13px; font-weight: 700; color: #166534; margin-bottom: 4px;">Auto Scan Kurs Valas Aktif</p>
+      <p style="font-size: 11px; color: #15803d; margin-bottom: 10px;">(Secure Backend Serverless AI)</p>
       
       <label class="scan-btn-label">
         Ambil / Pilih Gambar
@@ -547,12 +520,6 @@
   }
 
   function initApp() {
-    // Ambil API Key lama jika ada
-    const savedKey = localStorage.getItem("gemini_api_key");
-    if (savedKey) {
-      document.getElementById("gemini-key").value = savedKey;
-    }
-
     const inputsBnContainer = document.getElementById("inputs-bn");
     const inputsTtContainer = document.getElementById("inputs-tt");
     const displayBnContainer = document.getElementById("display-bn");
@@ -617,20 +584,10 @@
   function processAndScan(input) {
     if (!input.files || !input.files[0]) return;
     
-    const apiKey = document.getElementById("gemini-key").value.trim();
-    if (!apiKey) {
-      alert("Masukkan Gemini API Key kamu terlebih dahulu di kolom bagian atas!");
-      input.value = "";
-      return;
-    }
-
-    // Simpan API key ke storage browser biar ga ngetik ulang terus
-    localStorage.setItem("gemini_api_key", apiKey);
-
     const file = input.files[0];
     const statusDiv = document.getElementById("scan-status");
 
-    statusDiv.innerHTML = "⏳ Mengompresi dan menyiapkan gambar...";
+    statusDiv.innerHTML = "⏳ Menyiapkan gambar...";
     statusDiv.style.color = "#15803d";
 
     const reader = new FileReader();
@@ -638,50 +595,19 @@
       const base64Data = e.target.result.split(',')[1];
       const mimeType = file.type;
       
-      statusDiv.innerHTML = "🧠 Mengirim ke Google Gemini AI Vision (Mohon tunggu)...";
+      statusDiv.innerHTML = "🧠 Memproses data lewat Secure Backend AI...";
       
-      // Hit langsung ke API Google Resmi dari sisi Client (Browser)
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-      const aiPrompt = `Kamu adalah sistem AI pemindai tabel kurs yang bertugas mengekstrak angka kurs dari gambar secara akurat.
-Mata uang yang dicari: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
-Kategori: BANK NOTES (bn_b untuk beli, bn_j untuk jual) dan TELEGRAPHIC TRANSFER (tt_b untuk beli, tt_j untuk jual).
-
-Keluarkan hasil akhir HANYA dalam format JSON mentah tanpa blok kode markdown (\`\`\`json) dan tanpa kalimat pembuka/penutup apapun. Struktur JSON wajib persis seperti ini:
-{
-  "USD": {"bn_b": "16100", "bn_j": "16350", "tt_b": "16150", "tt_j": "16250"},
-  "AUD": {"bn_b": "10400", "bn_j": "10650", "tt_b": "10450", "tt_j": "10550"}
-}
-Isikan angka mentah tanpa pemisah ribuan (titik/koma). Jika mata uang tertentu tidak ada di tabel gambar, kosongkan saja nilainya "".`;
-
       try {
-        const response = await fetch(url, {
+        // Mengirim data ke rute backend internal Vercel kita (/api/scan)
+        const response = await fetch("/api/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: aiPrompt },
-                { inlineData: { mimeType: mimeType, data: base64Data } }
-              ]
-            }]
-          })
+          body: JSON.stringify({ mimeType: mimeType, base64Data: base64Data })
         });
 
-        if (!response.ok) {
-          const errRes = await response.json();
-          throw new Error(errRes.error?.message || `HTTP error! status: ${response.status}`);
-        }
+        const ratesData = await response.json();
+        if (!response.ok) throw new Error(ratesData.error || "Gagal memproses gambar");
 
-        const resData = await response.json();
-        let rawText = resData.candidates[0].content.parts[0].text.trim();
-        
-        // Bersihkan pembungkus markdown ```json jika AI membandel
-        if (rawText.startsWith("```")) {
-          rawText = rawText.replace(/^```json/, "").replace(/^```/, "").replace(/```$/, "").trim();
-        }
-
-        const ratesData = JSON.parse(rawText);
         applyAiRates(ratesData);
         
         statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
