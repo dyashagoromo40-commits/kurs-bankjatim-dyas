@@ -28,13 +28,14 @@
       font-family: 'Poppins', sans-serif;
       background: #f8fafc;
       color: var(--text-main);
-      padding: 20px;
+      padding: 15px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
       min-height: 100vh;
     }
 
+    /* CONTAINER UTAMA RESPONSIF */
     .app-container {
       display: grid;
       grid-template-columns: 460px 1fr;
@@ -94,6 +95,7 @@
       margin-top: 8px;
       transition: background 0.2s;
       box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+      width: 100%; /* Menyesuaikan area sentuh HP */
     }
 
     .scan-btn-label:hover {
@@ -132,24 +134,25 @@
     }
 
     .table-input td {
-      padding: 4px 2px;
+      padding: 6px 2px; /* Diperlebar sedikit agar nyaman di-tap jari di HP */
     }
 
     .currency-label {
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--bg-dark);
     }
 
     .input-field {
       width: 100%;
-      padding: 6px 10px;
+      padding: 8px 10px; /* Padding lebih gemuk responsif touch input */
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-family: inherit;
       font-size: 13px;
       font-weight: 500;
       transition: all 0.2s;
+      -webkit-appearance: none; /* Cegah gaya default safari mobile */
     }
 
     .input-field:focus {
@@ -177,13 +180,25 @@
       background: #1e293b;
     }
 
-    /* POSTER DISPLAY PREVIEW */
+    /* PREVIEW AREA & RESPONSIVE SCROLL WRAPPER */
     .preview-area {
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
+      overflow: hidden;
     }
 
+    .poster-scroll-container {
+      width: 100%;
+      overflow-x: auto; /* Memungkinkan swipe horizontal di HP */
+      padding: 10px 0 25px 0;
+      display: flex;
+      justify-content: flex-start;
+      -webkit-overflow-scrolling: touch; /* Perhalus scrolling di iOS/Safari */
+    }
+
+    /* POSTER UKURAN TETAP (Wajib untuk html2canvas agar presisi) */
     .poster {
       width: 1200px;
       height: 675px;
@@ -193,6 +208,7 @@
       position: relative;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      flex-shrink: 0; /* Mencegah poster tertekan mengecil */
     }
 
     .poster-bg-grid {
@@ -373,6 +389,39 @@
       padding: 4px 10px;
       border-radius: 6px;
     }
+
+    /* MEDIA QUERIES UNTUK RESPONSIVITAS TOTAL (LAPTOP KECIL & HP) */
+    @media (max-width: 1650px) {
+      .app-container {
+        grid-template-columns: 1fr; /* Berubah jadi 1 kolom bertumpuk ke bawah */
+        max-width: 1200px;
+      }
+      .input-panel {
+        max-height: none; /* Matikan batas scroll panel di mode tumpuk */
+      }
+      .poster-scroll-container {
+        justify-content: center; /* Tetap di tengah jika muat di layar */
+      }
+    }
+
+    @media (max-width: 1240px) {
+      .poster-scroll-container {
+        justify-content: flex-start; /* Beri ruang agar bisa di-swipe jika layar lebih kecil dari poster */
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 8px; /* Hemat ruang layar HP tipis */
+      }
+      .input-panel {
+        padding: 15px;
+      }
+      .scan-btn-label {
+        font-size: 13px;
+        padding: 12px 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -416,49 +465,54 @@
   </div>
 
   <div class="preview-area">
-    <div id="poster" class="poster">
-      <div class="poster-bg-grid"></div>
-      <div class="glow-top-right"></div>
-      <div class="glow-bottom-left"></div>
+    <p style="font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 500;" class="hide-on-desktop">
+      *Geser poster ke kanan/kiri untuk melihat tampilan penuh di HP
+    </p>
+    <div class="poster-scroll-container">
+      <div id="poster" class="poster">
+        <div class="poster-bg-grid"></div>
+        <div class="glow-top-right"></div>
+        <div class="glow-bottom-left"></div>
 
-      <div class="poster-content">
-        <div class="poster-header">
-          <img class="brand-logo" src="Bank Jatim Logo (PNG-1080p) - FileVector69.png" alt="Logo Bank Jatim">
-          <div id="live-date" class="date-badge">-</div>
-        </div>
-
-        <div class="poster-title-area">
-          <div class="main-title">INDIKASI <span>SPECIAL RATE</span></div>
-          <div class="sub-title">PT BANK PEMBANGUNAN DAERAH JAWA TIMUR, TBK</div>
-        </div>
-
-        <div class="rates-container">
-          <div class="rate-card">
-            <div class="card-heading">BANK NOTES</div>
-            <table class="display-table">
-              <thead>
-                <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
-              </thead>
-              <tbody id="display-bn"></tbody>
-            </table>
+        <div class="poster-content">
+          <div class="poster-header">
+            <img class="brand-logo" src="Bank Jatim Logo (PNG-1080p) - FileVector69.png" alt="Logo Bank Jatim">
+            <div id="live-date" class="date-badge">-</div>
           </div>
 
-          <div class="rate-card">
-            <div class="card-heading">TELEGRAPHIC TRANSFER</div>
-            <table class="display-table">
-              <thead>
-                <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
-              </thead>
-              <tbody id="display-tt"></tbody>
-            </table>
+          <div class="poster-title-area">
+            <div class="main-title">INDIKASI <span>SPECIAL RATE</span></div>
+            <div class="sub-title">PT BANK PEMBANGUNAN DAERAH JAWA TIMUR, TBK</div>
           </div>
-        </div>
 
-        <div class="poster-footer">
-          <div class="footer-note">
-            *Merupakan indikasi pada jam tersebut untuk transaksi &ge; IDR 25 juta (Bank Notes) atau &ge; USD 2.000 (Telegraphic Transfer). Kurs dapat berubah sewaktu-waktu sesuai kondisi pasar keuangan. Segera hubungi Cabang untuk mendapatkan kurs yang berlaku.
+          <div class="rates-container">
+            <div class="rate-card">
+              <div class="card-heading">BANK NOTES</div>
+              <table class="display-table">
+                <thead>
+                  <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
+                </thead>
+                <tbody id="display-bn"></tbody>
+              </table>
+            </div>
+
+            <div class="rate-card">
+              <div class="card-heading">TELEGRAPHIC TRANSFER</div>
+              <table class="display-table">
+                <thead>
+                  <tr><th align="left">Mata Uang</th><th class="text-center">Kurs Beli</th><th class="text-right">Kurs Jual</th></tr>
+                </thead>
+                <tbody id="display-tt"></tbody>
+              </table>
+            </div>
           </div>
-          <div id="live-timestamp" class="timestamp">Update: -</div>
+
+          <div class="poster-footer">
+            <div class="footer-note">
+              *Merupakan indikasi pada jam tersebut untuk transaksi &ge; IDR 25 juta (Bank Notes) atau &ge; USD 2.000 (Telegraphic Transfer). Kurs dapat berubah sewaktu-waktu sesuai kondisi pasar keuangan. Segera hubungi Cabang untuk mendapatkan kurs yang berlaku.
+            </div>
+            <div id="live-timestamp" class="timestamp">Update: -</div>
+          </div>
         </div>
       </div>
     </div>
@@ -558,6 +612,12 @@
     });
 
     handleLiveUpdate();
+
+    // Sembunyikan panduan teks swipe jika dibuka di komputer layar lebar
+    if (window.innerWidth > 1240) {
+      const hint = document.querySelector(".hide-on-desktop");
+      if(hint) hint.style.display = "none";
+    }
   }
 
   function handleLiveUpdate() {
@@ -582,50 +642,49 @@
   }
 
   async function processAndScan(input) {
-  if (!input.files || !input.files[0]) return;
-  
-  const statusDiv = document.getElementById("scan-status");
-  const file = input.files[0];
-  statusDiv.innerHTML = "⏳ Menyiapkan dokumen gambar...";
-  statusDiv.style.color = "#15803d";
-
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    const base64Data = e.target.result.split(',')[1];
-    const mimeType = file.type;
+    if (!input.files || !input.files[0]) return;
     
-    statusDiv.innerHTML = "🧠 Memproses data lewat Server Backend Aman...";
+    const statusDiv = document.getElementById("scan-status");
+    const file = input.files[0];
+    statusDiv.innerHTML = "⏳ Menyiapkan dokumen gambar...";
     statusDiv.style.color = "#15803d";
-    
-    try {
-      // Memanggil endpoint serverless Vercel kita sendiri
-      const response = await fetch("/api/scan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mimeType: mimeType,
-          data: base64Data
-        })
-      });
 
-      const ratesData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(ratesData.error || "Terjadi kesalahan server.");
-      }
-
-      applyAiRates(ratesData);
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64Data = e.target.result.split(',')[1];
+      const mimeType = file.type;
       
-      statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
-      statusDiv.style.color = "#16a34a";
-    } catch (error) {
-      console.error(error);
-      statusDiv.innerHTML = `❌ ${error.message}`;
-      statusDiv.style.color = "#dc2626";
-    }
-  };
-  reader.readAsDataURL(file);
-}
+      statusDiv.innerHTML = "🧠 Memproses data lewat Server AI...";
+      statusDiv.style.color = "#15803d";
+      
+      try {
+        const response = await fetch("/api/scan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mimeType: mimeType,
+            data: base64Data
+          })
+        });
+
+        const ratesData = await response.json();
+
+        if (!response.ok) {
+          throw new Error(ratesData.error || "Terjadi kesalahan server.");
+        }
+
+        applyAiRates(ratesData);
+        
+        statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
+        statusDiv.style.color = "#16a34a";
+      } catch (error) {
+        console.error(error);
+        statusDiv.innerHTML = `❌ ${error.message}`;
+        statusDiv.style.color = "#dc2626";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 
   function applyAiRates(data) {
     currencies.forEach(cur => {
@@ -644,11 +703,14 @@
     handleLiveUpdate();
 
     setTimeout(() => {
+      // Ditambahkan parameter windowWidth agar rendering html2canvas di HP tetap utuh 1200px
       html2canvas(posterNode, {
         scale: 2,
         useCORS: true, 
         allowTaint: false,
-        backgroundColor: "#ffffff"
+        backgroundColor: "#ffffff",
+        windowWidth: 1200,
+        windowHeight: 675
       }).then(canvas => {
         try {
           let triggerLink = document.createElement("a");
