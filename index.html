@@ -26,7 +26,7 @@
 
     body {
       font-family: 'Poppins', sans-serif;
-      background: #f8fafc;
+      background: #f1f5f9;
       color: var(--text-main);
       padding: 15px;
       display: flex;
@@ -73,7 +73,7 @@
       margin-top: 4px;
     }
 
-    /* BOX SCANNER SECURE BACKEND */
+    /* BOX SCANNER */
     .scanner-box {
       background: #f0fdf4;
       border: 2px dashed #16a34a;
@@ -180,7 +180,7 @@
       background: #1e293b;
     }
 
-    /* PREVIEW AREA & RESPONSIVE SCROLL WRAPPER */
+    /* PREVIEW AREA */
     .preview-area {
       display: flex;
       flex-direction: column;
@@ -198,16 +198,16 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* POSTER UKURAN TETAP */
+    /* POSTER ULTRAMODERN CANVAS (1200x675) */
     .poster {
       width: 1200px;
       height: 675px;
       background: #ffffff;
-      border-radius: 24px;
-      padding: 45px;
+      border-radius: 28px;
+      padding: 48px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.12);
       flex-shrink: 0;
     }
 
@@ -218,33 +218,30 @@
       width: 100%;
       height: 100%;
       background-image: 
-        linear-gradient(rgba(226, 232, 240, 0.4) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(226, 232, 240, 0.4) 1px, transparent 1px);
-      background-size: 30px 30px;
+        linear-gradient(rgba(226, 232, 240, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(226, 232, 240, 0.3) 1px, transparent 1px);
+      background-size: 24px 24px;
       z-index: 1;
     }
 
+    /* INTENSIFIKASI EFEK GLOW MERAH DENGAN RADIAL NEON GRADIENT */
     .glow-top-right {
       position: absolute;
-      width: 500px;
-      height: 500px;
-      background: var(--bj-red);
-      filter: blur(150px);
-      opacity: 0.12;
-      top: -150px;
-      right: -150px;
+      width: 750px;
+      height: 750px;
+      background: radial-gradient(circle, rgba(227, 27, 35, 0.22) 0%, rgba(227, 27, 35, 0.06) 45%, transparent 70%);
+      top: -280px;
+      right: -250px;
       z-index: 1;
     }
 
     .glow-bottom-left {
       position: absolute;
-      width: 400px;
-      height: 400px;
-      background: var(--bj-red);
-      filter: blur(130px);
-      opacity: 0.08;
-      bottom: -150px;
-      left: -150px;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(227, 27, 35, 0.14) 0%, rgba(227, 27, 35, 0.03) 45%, transparent 70%);
+      bottom: -250px;
+      left: -220px;
       z-index: 1;
     }
 
@@ -264,28 +261,32 @@
     }
 
     .brand-logo {
-      height: 52px;
+      height: 48px;
+      object-fit: contain;
     }
 
     .date-badge {
-      background: var(--bg-dark);
-      color: white;
-      padding: 6px 16px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 600;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 7px 18px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     }
 
     .poster-title-area {
       text-align: center;
-      margin-top: -10px;
+      margin-top: -5px;
     }
 
     .main-title {
-      font-size: 44px;
+      font-size: 42px;
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: #0f172a;
+      line-height: 1.2;
     }
 
     .main-title span {
@@ -293,36 +294,41 @@
     }
 
     .sub-title {
-      font-size: 15px;
-      color: #475569;
-      font-weight: 500;
-      letter-spacing: 2px;
-      margin-top: 2px;
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      margin-top: 5px;
+      text-transform: uppercase;
     }
 
+    /* RATES BLOCK CONTAINER */
     .rates-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 35px;
-      margin: 20px 0;
+      gap: 30px;
+      margin: 15px 0;
     }
 
+    /* MODERN GLASSMORPHISM CARD DESIGN */
     .rate-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 24px;
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.05);
     }
 
     .card-heading {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
-      color: var(--bj-red);
-      letter-spacing: 1px;
-      margin-bottom: 15px;
+      color: #0f172a;
+      letter-spacing: 1.5px;
+      margin-bottom: 18px;
       border-left: 4px solid var(--bj-red);
-      padding-left: 10px;
+      padding-left: 12px;
     }
 
     .display-table {
@@ -331,63 +337,69 @@
     }
 
     .display-table th {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: #64748b;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f1f5f9;
+      color: #94a3b8;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
       text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .display-table td {
-      padding: 8px 0;
+      padding: 10px 0;
       font-size: 16px;
       font-weight: 600;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
+      border-bottom: 1px solid #f8fafc;
+      color: #1e293b;
+      /* Mencegah angka bergoyang & berbaris rapi vertikal ala Bloomberg Terminal */
+      font-variant-numeric: tabular-nums; 
     }
 
     .row-currency {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-weight: 700;
-      color: var(--bg-dark);
+      color: #0f172a;
     }
 
     .flag-icon {
-      width: 24px;
-      height: 16px;
+      width: 26px;
+      height: 18px;
       object-fit: cover;
-      border-radius: 3px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
     }
 
     .text-center { text-align: center; }
     .text-right { text-align: right; }
 
+    /* FOOTER DESIGN */
     .poster-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-top: 1px solid #e2e8f0;
-      padding-top: 12px;
+      padding-top: 14px;
       font-size: 11px;
       color: #64748b;
     }
 
     .footer-note {
       font-weight: 500;
-      max-width: 750px;
-      line-height: 1.4;
+      max-width: 780px;
+      line-height: 1.5;
     }
 
     .timestamp {
-      font-weight: 600;
-      color: var(--bg-dark);
-      background: #f1f5f9;
-      padding: 4px 10px;
-      border-radius: 6px;
+      font-weight: 700;
+      color: #0f172a;
+      background: rgba(15, 23, 42, 0.05);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
     }
 
     /* MEDIA QUERIES */
@@ -697,14 +709,13 @@
     handleLiveUpdate();
   }
 
-  // FUNGSI BARU MENGGUNAKAN HTML-TO-IMAGE (MENDUKUNG FULL CSS GLOW & GLASSMORPHISM)
   function downloadPoster() {
     const posterNode = document.querySelector("#poster");
     handleLiveUpdate();
 
     setTimeout(() => {
       htmlToImage.toPng(posterNode, {
-        pixelRatio: 2, // Menggantikan scale: 2 (Hasil HD tajam)
+        pixelRatio: 2,
         backgroundColor: "#ffffff",
         style: {
           transform: 'scale(1)',
