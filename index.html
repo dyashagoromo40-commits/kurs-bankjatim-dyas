@@ -582,51 +582,50 @@
   }
 
   async function processAndScan(input) {
-    if (!input.files || !input.files[0]) return;
+  if (!input.files || !input.files[0]) return;
+  
+  const statusDiv = document.getElementById("scan-status");
+  const file = input.files[0];
+  statusDiv.innerHTML = "⏳ Menyiapkan dokumen gambar...";
+  statusDiv.style.color = "#15803d";
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64Data = e.target.result.split(',')[1];
+    const mimeType = file.type;
     
-    const statusDiv = document.getElementById("scan-status");
-    const file = input.files[0];
-    statusDiv.innerHTML = "⏳ Menyiapkan dokumen gambar...";
+    statusDiv.innerHTML = "🧠 Memproses data lewat Server Backend Aman...";
     statusDiv.style.color = "#15803d";
+    
+    try {
+      // Memanggil endpoint serverless Vercel kita sendiri
+      const response = await fetch("/api/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mimeType: mimeType,
+          data: base64Data
+        })
+      });
 
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64Data = e.target.result.split(',')[1];
-      const mimeType = file.type;
-      
-      statusDiv.innerHTML = "🧠 Memproses data aman lewat Backend Serverless...";
-      statusDiv.style.color = "#15803d";
-      
-      try {
-        // Hanya mengirim data payload minimal ke serverless function Vercel Anda
-        const response = await fetch('/api/scan', {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            data: base64Data,
-            mimeType: mimeType
-          })
-        });
+      const ratesData = await response.json();
 
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error || "Gagal berkomunikasi dengan server backend.");
-        }
-
-        // Serverless backend langsung mengembalikan data JSON kurs yang bersih
-        const ratesData = await response.json();
-        applyAiRates(ratesData);
-        
-        statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
-        statusDiv.style.color = "#16a34a";
-      } catch (error) {
-        console.error(error);
-        statusDiv.innerHTML = `❌ Gagal memproses AI: ${error.message}`;
-        statusDiv.style.color = "#dc2626";
+      if (!response.ok) {
+        throw new Error(ratesData.error || "Terjadi kesalahan server.");
       }
-    };
-    reader.readAsDataURL(file);
-  }
+
+      applyAiRates(ratesData);
+      
+      statusDiv.innerHTML = "✅ Selesai! Data tabel kurs berhasil diproses 100%.";
+      statusDiv.style.color = "#16a34a";
+    } catch (error) {
+      console.error(error);
+      statusDiv.innerHTML = `❌ ${error.message}`;
+      statusDiv.style.color = "#dc2626";
+    }
+  };
+  reader.readAsDataURL(file);
+}
 
   function applyAiRates(data) {
     currencies.forEach(cur => {
