@@ -387,9 +387,7 @@
 
     <div class="scanner-box">
       <p style="font-size: 13px; font-weight: 700; color: #166534; margin-bottom: 6px;">Auto Scan Kurs Valas Aktif</p>
-      <p style="font-size: 11px; color: #15803d; margin-bottom: 12px;">(Direct Client-Side Gemini AI v2.5)</p>
-      
-      <input type="password" id="gemini-key" class="input-field" placeholder="Masukkan Gemini API Key Anda" style="margin-bottom: 12px; text-align: center;">
+      <p style="font-size: 11px; color: #15803d; margin-bottom: 12px;">(Secure Backend Serverless AI)</p>
       
       <label class="scan-btn-label">
         Ambil / Pilih Gambar
@@ -586,15 +584,7 @@
   async function processAndScan(input) {
     if (!input.files || !input.files[0]) return;
     
-    const apiKey = document.getElementById("gemini-key").value.trim();
     const statusDiv = document.getElementById("scan-status");
-
-    if (!apiKey) {
-      statusDiv.innerHTML = "❌ Gagal: Masukkan Gemini API Key terlebih dahulu.";
-      statusDiv.style.color = "#dc2626";
-      return;
-    }
-    
     const file = input.files[0];
     statusDiv.innerHTML = "⏳ Menyiapkan dokumen gambar...";
     statusDiv.style.color = "#15803d";
@@ -604,12 +594,10 @@
       const base64Data = e.target.result.split(',')[1];
       const mimeType = file.type;
       
-      statusDiv.innerHTML = "🧠 Memproses data langsung via Gemini AI (gemini-2.5-flash)...";
+      statusDiv.innerHTML = "🧠 Memproses data aman lewat Backend Serverless...";
+      statusDiv.style.color = "#15803d";
       
       try {
-        // Melakukan fetch langsung ke endpoint REST API resmi Google Gemini
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        
         const promptInstruction = `Analisislah gambar tabel kurs mata uang asing ini. Ekstrak data kurs Beli dan Jual untuk kategori Bank Notes (BN) dan Telegraphic Transfer (TT) untuk mata uang berikut jika ada: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
         
         Kembalikan respons berupa objek JSON murni tanpa format markdown apa pun (jangan gunakan pembungkus \`\`\`json), tanpa teks tambahan di luar JSON, dan ikuti struktur persis seperti ini:
@@ -619,28 +607,28 @@
         }
         Catatan: Ambil angka mentahnya saja (contoh: 16250 atau 103.50). Jika data mata uang atau nilai tertentu tidak ditemukan di gambar, isi nilainya dengan "".`;
 
-        const response = await fetch(url, {
+        // Mengirimkan request ke serverless function Vercel di web kamu
+        const response = await fetch('/api/scan', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: promptInstruction },
-                { inlineData: { mimeType: mimeType, data: base64Data } }
-              ]
-            }],
-            generationConfig: {
-              responseMimeType: "application/json"
-            }
+            imageBase64: base64Data,
+            mimeType: mimeType,
+            prompt: promptInstruction
           })
         });
 
         if (!response.ok) {
           const errData = await response.json();
-          throw new Error(errData.error?.message || "Gagal berkomunikasi dengan API");
+          throw new Error(errData.error || "Gagal berkomunikasi dengan server.");
         }
 
         const resData = await response.json();
+        
+        if (!resData.candidates || !resData.candidates[0].content.parts[0].text) {
+          throw new Error("Format respons AI tidak dikenali atau serverless API bermasalah.");
+        }
+
         let textResult = resData.candidates[0].content.parts[0].text;
         
         // Membersihkan sisa backticks jika AI tidak sengaja memuatnya
