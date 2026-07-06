@@ -17,10 +17,9 @@ export default async function handler(req, res) {
     // 2. Ambil API Key dari Vercel Environment Variable
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Proteksi mandiri jika API Key belum terbaca/kosong di server Vercel
     if (!apiKey) {
       return res.status(500).json({ 
-        error: 'Sistem mendeteksi bahwa GEMINI_API_KEY belum terpasang atau tidak terbaca di Environment Variables Vercel kamu. Silakan periksa kembali tab Settings > Environment Variables.' 
+        error: 'Sistem mendeteksi bahwa GEMINI_API_KEY belum terpasang di Vercel.' 
       });
     }
 
@@ -29,8 +28,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Data gambar atau tipe file tidak lengkap.' });
     }
 
-    // 3. Panggil langsung REST API Resmi Google Gemini (Sangat Stabil)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 3. Menggunakan model gemini-2.5-flash yang terbukti lancar di file lokalmu
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const promptInstruction = `Analisislah gambar tabel kurs mata uang asing ini. Ekstrak data kurs Beli dan Jual untuk kategori Bank Notes (BN) dan Telegraphic Transfer (TT) untuk mata uang berikut jika ada: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
     
