@@ -1,23 +1,37 @@
 // api/scan.js
-
 export default async function handler(req, res) {
-  // Hanya menerima metode POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Metode tidak diizinkan. Gunakan POST.' });
+  // 1. Atur Header CORS agar backend bisa diakses dengan aman
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  const { mimeType, data } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  // Validasi Environment Variable di Vercel
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Konfigurasi gagal: GEMINI_API_KEY belum dipasang di Vercel.' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Metode tidak diizinkan' });
   }
 
   try {
-    // Endpoint resmi Google Gemini menggunakan versi terbaru yang stabil (gemini-2.5-flash)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
+    // 2. Ambil API Key dari Vercel Environment Variable
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    // Proteksi mandiri jika API Key belum terbaca/kosong di server Vercel
+    if (!apiKey) {
+      return res.status(500).json({ 
+        error: 'Sistem mendeteksi bahwa GEMINI_API_KEY belum terpasang atau tidak terbaca di Environment Variables Vercel kamu. Silakan periksa kembali tab Settings > Environment Variables.' 
+      });
+    }
+
+    const { mimeType, data } = req.body;
+    if (!mimeType || !data) {
+      return res.status(400).json({ error: 'Data gambar atau tipe file tidak lengkap.' });
+    }
+
+    // 3. Panggil langsung REST API Resmi Google Gemini (Sangat Stabil)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
     const promptInstruction = `Analisislah gambar tabel kurs mata uang asing ini. Ekstrak data kurs Beli dan Jual untuk kategori Bank Notes (BN) dan Telegraphic Transfer (TT) untuk mata uang berikut jika ada: USD, AUD, GBP, SGD, JPY, HKD, EUR, CNY, MYR.
     
     Kembalikan respons berupa objek JSON murni tanpa format markdown apa pun (jangan gunakan pembungkus \`\`\`json), tanpa teks tambahan di luar JSON, dan ikuti struktur persis seperti ini:
@@ -27,9 +41,9 @@ export default async function handler(req, res) {
     }
     Catatan: Ambil angka mentahnya saja (contoh: 16250 atau 103.50). Jika data mata uang atau nilai tertentu tidak ditemukan di gambar, isi nilainya dengan "".`;
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const googleResponse = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{
           parts: [
@@ -38,29 +52,28 @@ export default async function handler(req, res) {
           ]
         }],
         generationConfig: {
-          responseMimeType: "application/json"
+          responseMimeType: 'application/json'
         }
       })
     });
 
-    if (!response.ok) {
-      const errData = await response.json();
-      return res.status(response.status).json({ error: errData.error?.message || "Gagal merespons dari Gemini API" });
+    const resData = await googleResponse.json();
+
+    if (!googleResponse.ok) {
+      return res.status(googleResponse.status).json({ 
+        error: `Google API Error: ${resData.error?.message || 'Gagal terhubung ke Gemini'}` 
+      });
     }
 
-    const resData = await response.json();
     let textResult = resData.candidates[0].content.parts[0].text;
     
-    // Bersihkan pembungkus markdown jika ada secara tidak sengaja
+    // Pembersihan jika AI tidak sengaja menyertakan balutan backticks ```json
     textResult = textResult.replace(/```json/g, "").replace(/```/g, "").trim();
     
     const ratesData = JSON.parse(textResult);
-    
-    // Kembalikan data kurs yang bersih ke frontend
     return res.status(200).json(ratesData);
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error: ' + error.message });
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
   }
 }
